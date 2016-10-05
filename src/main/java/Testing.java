@@ -12,6 +12,8 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfWriter;
+import javafx.scene.Node;
+import javafx.stage.Stage;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
 
@@ -32,27 +34,33 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map;
-
 import static com.lowagie.text.Annotation.FILE;
+
 
 /**
  * Created by sereo_000 on 26.09.2016.
  */
 public class Testing {
 
-    public static void main(String[] args) throws WriterException, IOException, DocumentException, PrintException, PrinterException {
-
+    public static void main(String args) throws Exception {
+        PrintList pL = new PrintList();
         String textInQrCode = "http://crunchify.com/";
         File pdfFileForPrint = new File("C:/Users/sereo_000/Downloads/3.pdf");
         File pdfFileWithWatermarkAndQrCode = new File("C:/Users/sereo_000/Downloads/1.pdf");
         com.lowagie.text.Image qrCode = Image.getInstance("C:/Users/sereo_000/Downloads/123.png");
         com.lowagie.text.Image watermark = Image.getInstance("C:/Users/sereo_000/Downloads/111.png");
         String pathWhereQrCodeWillBeSaved = "C:/Users/sereo_000/Downloads/12321.png";
+       // Node node =null;
+       // pL.main(args);
+       // Stage stage=null;
+        //pL.start(stage);
+        //String name =pL.nameGet();
         int sizeOfQrCode = 250;
         String fileType = "png";
         QrCodeMaking(textInQrCode,fileType,sizeOfQrCode,pathWhereQrCodeWillBeSaved);
         WatermarkAndQrCodeAddingOnFile(pdfFileForPrint,pdfFileWithWatermarkAndQrCode,qrCode,watermark);
-        PrintingFile(pdfFileWithWatermarkAndQrCode);
+        PrintingFile(pdfFileWithWatermarkAndQrCode,args);
+        //File jarFile = new File("C:/Users/sereo_000/IdeaProjects/HelloJavaFX/out/artifacts/HelloJavaFX/HelloJavaFX.jar");
     }
     private static void QrCodeMaking(String textInQrCode, String fileType, int sizeOfQrCode, String pathWhereQrCodeWillBeSaved){
         File myFile = new File(pathWhereQrCodeWillBeSaved);
@@ -122,8 +130,8 @@ public class Testing {
         }
         return null;
     }
-    private static void PrintingFile(File pdfFileWithWatermarkAndQrCode) throws IOException, PrinterException {
-        PrintService myPrintService = findPrintService("NPIF848B5");
+    private static void PrintingFile(File pdfFileWithWatermarkAndQrCode, String name) throws IOException, PrinterException {
+        PrintService myPrintService = findPrintService(name);
         PrinterJob job = PrinterJob.getPrinterJob();
         PDDocument document = PDDocument.load(pdfFileWithWatermarkAndQrCode);
         job.setPageable(new PDFPageable(document));
