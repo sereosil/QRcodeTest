@@ -8,10 +8,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.lowagie.text.*;
 import com.lowagie.text.Image;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfStamper;
-import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.*;
 import javafx.scene.Node;
 import javafx.stage.Stage;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -34,6 +31,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.UUID;
+
 import static com.lowagie.text.Annotation.FILE;
 
 
@@ -43,24 +42,31 @@ import static com.lowagie.text.Annotation.FILE;
 public class Testing {
 
     public static void main(String args) throws Exception {
-        PrintList pL = new PrintList();
+        File temp = File.createTempFile("temp-file-name", ".tmp");
+
+        System.out.println("Temp file : " + temp.getAbsolutePath());
+
+        //Get tempropary file path
+        String absolutePath = temp.getAbsolutePath();
+        String tempFilePath = absolutePath.
+                substring(0,absolutePath.lastIndexOf(File.separator));
+        UUID idForPDF = UUID.randomUUID();
+        String filenameOfPDF = idForPDF.toString().replaceAll("-","");
+        UUID idForQR = UUID.randomUUID();
+        String filenameOfQR = idForQR.toString().replaceAll("-","");
         String textInQrCode = "http://crunchify.com/";
         File pdfFileForPrint = new File("C:/Users/sereo_000/Downloads/3.pdf");
-        File pdfFileWithWatermarkAndQrCode = new File("C:/Users/sereo_000/Downloads/1.pdf");
+        File pdfFileWithWatermarkAndQrCode = new File(tempFilePath+"/"+filenameOfPDF+".pdf");
         com.lowagie.text.Image qrCode = Image.getInstance("C:/Users/sereo_000/Downloads/123.png");
         com.lowagie.text.Image watermark = Image.getInstance("C:/Users/sereo_000/Downloads/111.png");
-        String pathWhereQrCodeWillBeSaved = "C:/Users/sereo_000/Downloads/12321.png";
-       // Node node =null;
-       // pL.main(args);
-       // Stage stage=null;
-        //pL.start(stage);
-        //String name =pL.nameGet();
+        String pathWhereQrCodeWillBeSaved = tempFilePath+"/"+filenameOfQR+".png";
+        String attributeOfFile = "1234567890qwertyuiopasdfghjklzxcvbnm";
         int sizeOfQrCode = 250;
         String fileType = "png";
         QrCodeMaking(textInQrCode,fileType,sizeOfQrCode,pathWhereQrCodeWillBeSaved);
-        WatermarkAndQrCodeAddingOnFile(pdfFileForPrint,pdfFileWithWatermarkAndQrCode,qrCode,watermark);
+        WatermarkAndQrCodeAddingOnFile(pdfFileForPrint,pdfFileWithWatermarkAndQrCode,qrCode,watermark,attributeOfFile);
         PrintingFile(pdfFileWithWatermarkAndQrCode,args);
-        //File jarFile = new File("C:/Users/sereo_000/IdeaProjects/HelloJavaFX/out/artifacts/HelloJavaFX/HelloJavaFX.jar");
+        pdfFileWithWatermarkAndQrCode.deleteOnExit();
     }
     private static void QrCodeMaking(String textInQrCode, String fileType, int sizeOfQrCode, String pathWhereQrCodeWillBeSaved){
         File myFile = new File(pathWhereQrCodeWillBeSaved);
@@ -101,22 +107,28 @@ public class Testing {
         }
         System.out.println("\n\nYou have successfully created QR Code.");
     }
-    private static void WatermarkAndQrCodeAddingOnFile(File pdfFileForPrint,File pdfFileWithWatermarkAndQrCode, Image qrCode,Image watermark) throws IOException, DocumentException {
+    private static void WatermarkAndQrCodeAddingOnFile(File pdfFileForPrint,File pdfFileWithWatermarkAndQrCode, Image qrCode,Image watermark, String attributeOfFile) throws IOException, DocumentException {
         watermark.setAlignment(Element.ALIGN_CENTER);
         boolean a = pdfFileForPrint.canWrite();
         PdfReader reader = new PdfReader(pdfFileForPrint.getPath());
-        //PdfWriter writer = new PdfWriter(pdfFileForPrint);
         PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(
                 pdfFileWithWatermarkAndQrCode));
         for(int i=1; i<= reader.getNumberOfPages(); i++) {
             PdfContentByte content = stamper.getOverContent(i);
             PdfContentByte content1 = stamper.getUnderContent(i);
+            PdfContentByte content2 = stamper.getOverContent(i);
             qrCode.setAbsolutePosition(530f, 780f);
             qrCode.scaleAbsolute(50f,50f);
             watermark.setAbsolutePosition(140f, 350f);
             watermark.setRotationDegrees(45);
             content.addImage(qrCode);
             content1.addImage(watermark);
+            ColumnText ct = new ColumnText( content2 );
+// this are the coordinates where you want to add text
+// if the text does not fit inside it will be cropped
+            ct.setSimpleColumn(30,835,750,50);
+            ct.setText(new Phrase(attributeOfFile));
+            ct.go();
         }
         stamper.getWriter().addDirectImageSimple(qrCode);
         stamper.close();
