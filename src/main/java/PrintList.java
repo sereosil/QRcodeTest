@@ -17,13 +17,13 @@ public class PrintList extends Application {
         dialog.setHeaderText("Choose the printer!");
         dialog.setContentText("Choose a printer from available printers");
         dialog.setTitle("Printer Choice");
-        boolean justForWhile =true;
+        boolean justForWhile = true;
         while (justForWhile){
             Optional<Printer> opt = dialog.showAndWait();
         if (opt.isPresent()) {
             Printer printer = opt.get();
             String nameOfPrinter = printer.getName();
-            if (nameOfPrinter.contains("PDF") || nameOfPrinter.contains("OneNote")||nameOfPrinter.contains("Fax")) {
+            if (nameOfPrinter.contains("PDF") || nameOfPrinter.contains("OneNote") || nameOfPrinter.contains("Fax") || nameOfPrinter.contains("Pdf") || nameOfPrinter.contains("pdf")) {
                 Dialog errorDialog = new Dialog();
                 errorDialog.setHeaderText("This printer is not available!");
                 errorDialog.setTitle("Error choosing printer");
@@ -38,11 +38,6 @@ public class PrintList extends Application {
         }
         }
         return null;
-    }
-    public String nameGet(){
-        Node node=null;
-        String name = print(node);
-        return name;
     }
 
     public static void main(String[] args) {
