@@ -17,7 +17,7 @@ public class PrintList extends Application {
         dialog.setHeaderText("Choose the printer!");
         dialog.setContentText("Choose a printer from available printers");
         dialog.setTitle("Printer Choice");
-        boolean justForWhile =true;
+        boolean justForWhile = true;
         while (justForWhile){
             Optional<Printer> opt = dialog.showAndWait();
         if (opt.isPresent()) {
